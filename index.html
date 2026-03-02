@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maria Eloise 💙</title>
+
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  background: black;
+  font-family: "Segoe UI Emoji", "Noto Color Emoji", Arial, sans-serif;
+  color: white;
+}
+
+/* Canvas estrelas */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+/* Centralização */
+.center {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  transition: opacity 1s ease;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  width: 90%;
+  max-width: 400px;
+}
+
+/* Inputs */
+input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 15px;
+  width: 80%;
+  text-align: center;
+  font-size: 16px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #4cc9f0;
+  color: black;
+  font-weight: bold;
+}
+
+/* Conteúdo oculto */
+#conteudo {
+  display: none;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+#contador {
+  font-size: 24px;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.glow {
+  animation: brilho 2s infinite alternate;
+}
+
+@keyframes brilho {
+  from { text-shadow: 0 0 5px #4cc9f0; }
+  to { text-shadow: 0 0 20px #4cc9f0, 0 0 40px #4cc9f0; }
+}
+
+.frase {
+  margin-top: 20px;
+  font-size: 18px;
+  opacity: 0;
+  transition: opacity 3s;
+}
+
+.heart {
+  position: absolute;
+  top: -10px;
+  color: #4cc9f0;
+  animation: fall linear infinite;
+  z-index: 1;
+}
+
+@keyframes fall {
+  to { transform: translateY(110vh); }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="space"></canvas>
+
+<div class="center" id="senhaTela">
+  <div class="card">
+    <h2>Digite a senha 💙</h2>
+    <input type="password" id="senhaInput" placeholder="Senha...">
+    <br>
+    <button onclick="verificarSenha()">Entrar</button>
+    <p id="erro" style="color:red;"></p>
+    <p style="font-size: 12px; color: #aaa;">Dica: Uma data muito especial!</p>
+  </div>
+</div>
+
+<div class="center" id="conteudo">
+  <div class="card">
+    <h1 id="nome"></h1>
+    <div>Eu te amo há 💙</div>
+    <div id="contador"></div>
+    <div class="frase" id="fraseFinal">
+      E cada segundo ao seu lado é o melhor da minha vida 💙
+    </div>
+  </div>
+</div>
+
+<script>
+const senhaCorreta = "1808";
+let tentativas = 0;
+let bloqueado = false;
+
+function verificarSenha() {
+  if (bloqueado) return;
+
+  const senha = document.getElementById("senhaInput").value;
+
+  if (senha === senhaCorreta) {
+    document.getElementById("senhaTela").style.opacity = 0;
+    setTimeout(() => {
+      document.getElementById("senhaTela").style.display = "none";
+      document.getElementById("conteudo").style.display = "flex";
+      document.getElementById("space").style.opacity = 1;
+      setTimeout(() => {
+        document.getElementById("conteudo").style.opacity = 1;
+      }, 200);
+      iniciarUniverso();
+    }, 800);
+  } else {
+    tentativas++;
+    document.getElementById("erro").innerText = "Senha incorreta 💔 (" + tentativas + "/3)";
+
+    if (tentativas >= 3) {
+      bloqueado = true;
+      document.getElementById("erro").innerText = "Muitas tentativas... aguarde 10 segundos 💔";
+      setTimeout(() => {
+        tentativas = 0;
+        bloqueado = false;
+        document.getElementById("erro").innerText = "";
+      }, 10000);
+    }
+  }
+}
+
+function iniciarUniverso() {
+  const canvas = document.getElementById("space");
+  const ctx = canvas.getContext("2d");
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const stars = [];
+  for (let i = 0; i < 200; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = "white";
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  // CORREÇÃO DO EFEITO DE DIGITAR (Suporte a Emoji)
+  const textoOriginal = "Maria Eloise 💙";
+  const caracteres = Array.from(textoOriginal); // Garante que o emoji não quebre
+  let index = 0;
+  const elementoNome = document.getElementById("nome");
+
+  function digitar() {
+    if (index < caracteres.length) {
+      elementoNome.innerHTML += caracteres[index];
+      index++;
+      setTimeout(digitar, 150);
+    } else {
+      elementoNome.classList.add("glow");
+    }
+  }
+  digitar();
+
+  const dataInicio = new Date("2025-06-15T00:00:00");
+
+  function atualizar() {
+    const agora = new Date();
+    const diff = agora - dataInicio;
+
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutos = Math.floor((diff / (1000 * 60)) % 60);
+    const segundos = Math.floor((diff / 1000) % 60);
+
+    document.getElementById("contador").innerHTML =
+      dias + " dias 💙<br>" +
+      horas + " horas 💕<br>" +
+      minutos + " minutos 💘<br>" +
+      segundos + " segundos ❤️";
+  }
+
+  setInterval(atualizar, 1000);
+  atualizar();
+
+  setTimeout(() => {
+    document.getElementById("fraseFinal").style.opacity = 1;
+  }, 4000);
+
+  function criarCoracao() {
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.innerHTML = "💙";
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = Math.random() * 20 + 15 + "px";
+    h.style.animationDuration = Math.random() * 3 + 2 + "s";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 5000);
+  }
+  setInterval(criarCoracao, 600);
+}
+</script>
+
+</body>
+  </html>
